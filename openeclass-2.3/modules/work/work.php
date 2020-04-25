@@ -43,6 +43,7 @@ $helpTopic = 'Work';
 include '../../include/baseTheme.php';
 include '../../include/lib/forcedownload.php';
 
+$token = $_SESSION['token'];
 $head_content = "
 <script type='text/javascript'>
 function confirmation (name)
@@ -91,11 +92,9 @@ include('../../include/action.php');
 $action = new action();
 $action->record('MODULE_ID_ASSIGN');
 /**************************************/
-
 $tool_content = "";
 
 include('work_functions.php');
-
 $workPath = $webDir."courses/".$currentCourseID."/work";
 
 if ($is_adminOfCourse) { //Only course admins can download assignments
@@ -185,7 +184,7 @@ if ($is_adminOfCourse) {
 	}
 } else {
 	if (isset($id)) {
-		if (isset($work_submit)) {
+		if (isset($work_submit) && ($token==$_POST['token'])) {
 			$nameTools = $m['SubmissionStatusWorkInfo'];
 			$navigation[] = array("url"=>"work.php", "name"=> $langWorks);
 			$navigation[] = array("url"=>"work.php?id=$id", "name"=>$m['WorkView']);
@@ -605,7 +604,7 @@ function show_student_assignment($id)
 
 function show_submission_form($id)
 {
-	global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3;
+	global $tool_content, $m, $langWorkFile, $langSendFile, $langSubmit, $uid, $langNotice3, $token;
 
 	if (is_group_assignment($id) and ($gid = user_group($uid))) {
 		$tool_content .= "<p>$m[this_is_group_assignment] ".
@@ -635,6 +634,7 @@ function show_submission_form($id)
       <th>&nbsp;</th>
       <td><input type="submit" value="${langSubmit}" name="work_submit" /><br />$langNotice3</td>
     </tr>
+        <td><input value="${token}" name="token" type="hidden"/></td>
     </tbody>
     </table>
     <br/>
@@ -803,7 +803,7 @@ function show_assignment($id, $message = FALSE)
 		WHERE assign.assignment_id='$id' AND user.user_id = assign.uid
 		ORDER BY $order $rev");
 
-	/*  The query is changed (AND assign.grade<>'' is appended) in order to constract the chart of 
+	/*  The query is changed (AND assign.grade<>'' is appended) in order to constract the chart of
 	 * grades distribution according to the graded works only (works that are not graded are omitted). */
 	$numOfResults = db_query("SELECT *
 		FROM `$GLOBALS[code_cours]`.assignment_submit AS assign,
@@ -811,7 +811,7 @@ function show_assignment($id, $message = FALSE)
 		WHERE assign.assignment_id='$id' AND user.user_id = assign.uid AND assign.grade<>''
 		ORDER BY $order $rev");
 	$num_resultsForChart = mysql_num_rows($numOfResults);
-	
+
 	$num_results = mysql_num_rows($result);
 	if ($num_results > 0) {
 		if ($num_results == 1) {
@@ -1174,7 +1174,7 @@ function submit_grade_comments($id, $sid, $grade, $comment)
 
 	$stupid_user = 0;
 
-	/*  If check expression is changed by nikos, in order to give to teacher the ability to 
+	/*  If check expression is changed by nikos, in order to give to teacher the ability to
 	 * assign comments to a work without assigning grade. */
 	if (!is_numeric($grade) && '' != $grade ) {
 		$tool_content .= $langWorkWrongInput;

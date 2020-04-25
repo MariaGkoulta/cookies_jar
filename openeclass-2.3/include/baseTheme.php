@@ -39,6 +39,9 @@
  *
  */
 include ('init.php');
+if (empty($_SESSION['token'])) {
+		$_SESSION['token'] = md5(uniqid(mt_rand(), true));
+	}
 if ($is_adminOfCourse and isset($currentCourseID)) {
 	if (isset($_GET['hide']) and $_GET['hide'] == 0) {
 		db_query("UPDATE accueil SET visible = 0 WHERE id='$eclass_module_id'", $currentCourseID);
@@ -187,10 +190,10 @@ function draw($toolContent, $menuTypeID, $tool_css = null, $head_content = null,
 
 		$t->set_var ( 'TOOL_CONTENT', $toolContent );
 
-		// If we are on the login page we can define two optional variables 
+		// If we are on the login page we can define two optional variables
 		// in common.inc.php (to allow internationalizing messages)
 		// for extra content on the left and right bar.
-		
+
 		if ($homePage  && !isset($_SESSION['uid'])) {
 			$t->set_var ( 'ECLASS_HOME_EXTRAS_LEFT', $langExtrasLeft );
 			$t->set_var ( 'ECLASS_HOME_EXTRAS_RIGHT', $langExtrasRight );
@@ -510,4 +513,3 @@ function lang_select_options($name, $onchange_js = '', $default_langcode = false
         }
 	return selection($native_language_names, $name, $default_langcode, $onchange_js);
 }
-

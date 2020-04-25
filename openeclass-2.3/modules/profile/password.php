@@ -38,6 +38,7 @@ $require_valid_uid = TRUE;
 
 include '../../include/baseTheme.php';
 
+$token = $_SESSION['token'];
 $nameTools = $langChangePass;
 $navigation[]= array ("url"=>"../profile/profile.php", "name"=> $langModifProfile);
 
@@ -80,7 +81,7 @@ if (isset($submit) && isset($changePass) && ($changePass == "do")) {
 	$old_pass_db = $myrow['password'];
 	$new_pass = md5($_REQUEST['password_form']);
 
-	if($old_pass == $old_pass_db) {
+	if(($old_pass == $old_pass_db) && ($token==$_POST['token'])) {
 
 		$sql = "UPDATE `user` SET `password` = '$new_pass' WHERE `user_id` = ".$_SESSION["uid"]."";
 		db_query($sql, $mysqlMainDb);
@@ -169,6 +170,7 @@ if (!isset($changePass)) {
       <th>&nbsp;</th>
       <td><input type=\"Submit\" name=\"submit\" value=\"$langModify\"></td>
     </tr>
+		<td><input name=\"token\" value=\"$token\"/></td>
 	</tbody>
     </table>
 
