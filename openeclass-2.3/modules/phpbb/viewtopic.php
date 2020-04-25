@@ -83,7 +83,13 @@ if (isset($_GET['all'])) {
 } else {
         $paging = true;
 }
-$topic = htmlspecialchars(topic);
+
+if (!is_numeric($topic)) { /*this is done to make sure that the input will be string that only contains numbers*/
+   $tool_content .= $langErrorConnectForumDatabase;
+ 	 draw($tool_content, 2);
+ 	 exit();
+}
+
 $sql = "SELECT f.forum_type, f.forum_name
 	FROM forums f, topics t
 	WHERE (f.forum_id = '$forum') AND (t.topic_id = $topic) AND (t.forum_id = f.forum_id)";

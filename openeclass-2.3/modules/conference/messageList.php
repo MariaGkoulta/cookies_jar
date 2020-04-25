@@ -100,7 +100,7 @@ if (isset($_GET['store']) && $is_adminOfCourse && $token==$_GET['token']) {
 if (isset($chatLine) and trim($chatLine) != '' and $token==$_GET['token']) {
 	$fchat = fopen($fileChatName,'a');
 	$chatLine = mathfilter($chatLine, 12, '../../courses/mathimg/');
-	fwrite($fchat,$timeNow.' - '.$nick.' : '.htmlspecialchars($chatLine)."\n");
+	fwrite($fchat,$timeNow.' - '.$nick.' : '.htmlspecialchars(stripslashes($chatLine))."\n");
 	fclose($fchat);
 }
 
