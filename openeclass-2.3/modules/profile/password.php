@@ -170,7 +170,7 @@ if (!isset($changePass)) {
       <th>&nbsp;</th>
       <td><input type=\"Submit\" name=\"submit\" value=\"$langModify\"></td>
     </tr>
-		<td><input name=\"token\" value=\"$token\"/></td>
+		<td><input type=\"hidden\" name=\"token\" value=\"$token\"/></td>
 	</tbody>
     </table>
 
