@@ -36,6 +36,7 @@ require_once("../betacms_bridge/include/bcms.inc.php");
 $nameTools = $langCreateCourse . " (" . $langCreateCourseStep ." 1 " .$langCreateCourseStep2 . " 3)" ;
 $tool_content = $head_content = "";
 $lang_editor = langname_to_code($language);
+$token = $_SESSION['token'];
 
 $head_content .= <<<hContent
 <script type="text/javascript">
@@ -325,6 +326,7 @@ if (isset($_POST['back1']) or !isset($_POST['visit'])) {
 	<th>&nbsp;</th>
 	<td width='400'><input type='submit' name='back2' value='< $langPreviousStep '>&nbsp;
 	<input type='submit' name='create_course' value=\"$langFinalize\"></td>
+	<input type='hidden' name='token' value='$token' />
 	<td><p align='right'><small>$langFieldsOptionalNote</small></p></td>
 	</tr>
 	</tbody>
@@ -332,7 +334,7 @@ if (isset($_POST['back1']) or !isset($_POST['visit'])) {
 } // end of create3
 
 // create the course and the course database
-if (isset($_POST['create_course'])) {
+if (isset($_POST['create_course']) && ($token==$_POST['token'])) {
 
         $nameTools = $langCourseCreate;
         $facid = intval($faculte);
