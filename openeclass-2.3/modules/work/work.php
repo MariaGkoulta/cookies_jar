@@ -140,10 +140,10 @@ if ($is_adminOfCourse) {
 		new_assignment();
 	} elseif (isset($sid)) {
 		show_submission($sid);
-	} elseif (isset($_POST['new_assign'])) {
+	} elseif (isset($_POST['new_assign']) && ($token==$_POST['token'])) {
 		add_assignment($title, $comments, $desc, "$WorkEnd", $group_submissions);
 		show_assignments();
-	} elseif (isset($grades)) {
+	} elseif (isset($grades) && ($token==$_POST['token'])) {
 		$nameTools = $m['WorkView'];
 		$navigation[] = array("url"=>"work.php", "name"=> $langWorks);
 		submit_grades($grades_id, $grades);
@@ -157,7 +157,7 @@ if ($is_adminOfCourse) {
 				show_assignments($langAssignmentActivated);
 			} elseif ($choice == 'delete') {
 				die("invalid option");
-			} elseif ($choice == "do_delete") {
+			} elseif ($choice == 'do_delete' && ($token==$_REQUEST['token'])) {
 				$nameTools = $m['WorkDelete'];
 				$navigation[] = array("url"=>"work.php", "name"=> $langWorks);
 				delete_assignment($id);
@@ -165,7 +165,7 @@ if ($is_adminOfCourse) {
 				$nameTools = $m['WorkEdit'];
 				$navigation[] = array("url"=>"work.php", "name"=> $langWorks);
 				show_edit_assignment($id);
-			} elseif ($choice == 'do_edit') {
+			} elseif ($choice == 'do_edit' && ($token==$_POST['token'])) {
 				$nameTools = $m['WorkView'];
 				$navigation[] = array("url"=>"work.php", "name"=> $langWorks);
 				edit_assignment($id);
@@ -347,6 +347,7 @@ function new_assignment()
 	global $desc;
 	global $end_cal_Work;
 	global $langBack;
+  global $token;
 
 	$day	= date("d");
 	$month	= date("m");
@@ -396,6 +397,7 @@ function new_assignment()
       <th>&nbsp;</th>
       <td><input type='submit' name='new_assign' value='$langAdd' /></td>
     </tr>
+    <td><input type='hidden' name='token' value='$token'></td>
     </tbody>
     </table>
   </form>
@@ -438,6 +440,7 @@ function show_edit_assignment($id)
 	global $tool_content, $m, $langEdit, $langWorks, $langBack;
 	global $urlAppend;
 	global $end_cal_Work_db;
+  global $token;
 
 	$res = db_query("SELECT * FROM assignments WHERE id = '$id'");
 	$row = mysql_fetch_array($res);
@@ -508,6 +511,7 @@ cData;
     <tr>
       <th class='left'>&nbsp;</th>
       <td><input type='submit' name='do_edit' value='$langEdit' /></td>
+      <input type='hidden' name='token' value='$token'/>
     </tr>
     </tbody>
     </table>
@@ -650,14 +654,14 @@ cData;
 function assignment_details($id, $row, $message = null)
 {
 	global $tool_content, $m, $langDaysLeft, $langDays, $langWEndDeadline, $langNEndDeadLine, $langNEndDeadline, $langEndDeadline;
-	global $langDelAssign, $is_adminOfCourse, $langZipDownload, $langSaved ;
+	global $langDelAssign, $is_adminOfCourse, $langZipDownload, $langSaved, $token;
 
 
 	if ($is_adminOfCourse) {
 	$tool_content .= "
     <div id=\"operations_container\">
       <ul id=\"opslist\">
-        <li><a href=\"work.php?id=$id&amp;choice=do_delete\" onClick=\"return confirmation('".addslashes($row['title'])."');\">$langDelAssign</a></li>
+        <li><a href=\"work.php?id=$id&amp;choice=do_delete&token=$token\" onClick=\"return confirmation('".addslashes($row['title'])."');\">$langDelAssign</a></li>
         <li><a href=\"work.php?download=$id\">$langZipDownload</a></li>
       </ul>
     </div>
@@ -767,6 +771,7 @@ function show_assignment($id, $message = FALSE)
 	global $tool_content, $m, $langBack, $langNoSubmissions, $langSubmissions, $mysqlMainDb, $langWorks;
 	global $langEndDeadline, $langWEndDeadline, $langNEndDeadline, $langDays, $langDaysLeft, $langGradeOk;
 	global $currentCourseID, $webDir, $urlServer, $nameTools, $langGraphResults, $m;
+  global $token;
 
 	$res = db_query("SELECT *, (TO_DAYS(deadline) - TO_DAYS(NOW())) AS days FROM assignments WHERE id = '$id'");
 	$row = mysql_fetch_array($res);
@@ -953,6 +958,7 @@ cData;
       <th class='left' width='220'>&nbsp;</th>
       <td><input type='submit' name='submit_grades' value='${langGradeOk}'></td>
     </tr>
+    <input type='hidden' name='token' value='$token' />
     </tbody>
     </table>
     </form>
@@ -1081,7 +1087,7 @@ cData;
 // show all the assignments
 function show_assignments($message = null)
 {
-	global $tool_content, $m, $langNoAssign, $langNewAssign, $langCommands, $urlServer;
+	global $tool_content, $m, $langNoAssign, $langNewAssign, $langCommands, $urlServer, $token;
 
 	$result = db_query("SELECT * FROM assignments ORDER BY id");
 
@@ -1141,7 +1147,7 @@ cData;
       <td align='right'>
          <a href='work.php?id=$row[id]&amp;choice=edit'><img src='../../template/classic/img/edit.gif' alt='$m[edit]' /></a>";
 			$tool_content .= "
-         <a href='work.php?id=$row[id]&amp;choice=do_delete' onClick='return confirmation(\"".addslashes($row_title)."\");'><img src='../../template/classic/img/delete.gif' alt='$m[delete]' /></a>";
+         <a href='work.php?id=$row[id]&amp;choice=do_delete&token=$token' onClick='return confirmation(\"".addslashes($row_title)."\");'><img src='../../template/classic/img/delete.gif' alt='$m[delete]' /></a>";
 
 			if ($row['active']) {
 				$deactivate_temp = htmlspecialchars($m['deactivate']);
