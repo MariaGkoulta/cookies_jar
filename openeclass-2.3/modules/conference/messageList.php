@@ -26,6 +26,7 @@
 
 $require_current_course = TRUE;
 include '../../include/baseTheme.php';
+$token = $_SESSION['token'];
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <head>
@@ -62,16 +63,16 @@ if ($GLOBALS['language'] == 'greek')
 else
 	$timeNow = date("Y-m-d / H:i",time());
 
-if (!file_exists($fileChatName)) {
-	$fp = fopen($fileChatName, 'w')
-		or die ('<center>$langChatError</center>');
-	fclose($fp);
-}
+	if (!file_exists($fileChatName) && $token==$_GET['token']) {
+		$fp = fopen($fileChatName, 'w')
+			or die ('<center>$langChatError</center>');
+			fclose($fp);
+		}
 
 // chat commands
 
 // reset command
-if (isset($_GET['reset']) && $is_adminOfCourse) {
+if (isset($_GET['reset']) && $is_adminOfCourse && $token==$_GET['token']) {
 	$fchat = fopen($fileChatName,'w');
 	fwrite($fchat, $timeNow." ---- ".$langWashFrom." ---- ".$nick." --------\n");
 	fclose($fchat);
@@ -79,7 +80,7 @@ if (isset($_GET['reset']) && $is_adminOfCourse) {
 }
 
 // store
-if (isset($_GET['store']) && $is_adminOfCourse) {
+if (isset($_GET['store']) && $is_adminOfCourse && $token==$_GET['token']) {
 	$saveIn = "chat.".date("Y-m-j-B").".txt";
 	$chat_filename = date("YmdGis").randomkeys("8").".txt";
 
@@ -96,7 +97,7 @@ if (isset($_GET['store']) && $is_adminOfCourse) {
 }
 
 // add new line
-if (isset($chatLine) and trim($chatLine) != '') {
+if (isset($chatLine) and trim($chatLine) != '' and $token==$_GET['token']) {
 	$fchat = fopen($fileChatName,'a');
 	$chatLine = mathfilter($chatLine, 12, '../../courses/mathimg/');
 	fwrite($fchat,$timeNow.' - '.$nick.' : '.htmlspecialchars($chatLine)."\n");
