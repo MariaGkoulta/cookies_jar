@@ -44,6 +44,7 @@ include('../../include/action.php');
 $action = new action();
 $action->record('MODULE_ID_DROPBOX');
 /**************************************/
+$token = $_SESSION['token'];
 
 $tool_content .="
 <div id=\"operations_container\">
@@ -131,6 +132,7 @@ tCont2;
       <th class='left'>".$dropbox_lang['file']." :</th>
       <td><input type='file' name='file' size='35' />
           <input type='hidden' name='dropbox_unid' value='$dropbox_unid' />
+          <input type='hidden' name='token' value='$token'>
       </td>
     </tr>";
 
@@ -503,4 +505,3 @@ if (count($dropbox_person->sentWork)==0) {
 $tool_content .= "</tbody></table>";
 add_units_navigation(TRUE);
 draw($tool_content, 2, 'dropbox', $head_content);
-

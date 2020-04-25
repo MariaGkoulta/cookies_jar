@@ -38,6 +38,7 @@
 require_once("dropbox_init1.inc.php");
 include "../../include/lib/forcedownload.php";
 $nameTools = $dropbox_lang["dropbox"];
+$token = $_SESSION['token'];
 
 /**
  * ========================================
@@ -91,7 +92,7 @@ if (isset($_POST["submitWork"]))
 	$errormsg = '';
 
 
-if (!isset( $_POST['authors']) || !isset( $_POST['description']))
+if (!isset( $_POST['authors']) || !isset( $_POST['description']) || (!($token==$_POST['token'])))
 	{
 		$error = TRUE;
 		$errormsg = $dropbox_lang["badFormData"];
