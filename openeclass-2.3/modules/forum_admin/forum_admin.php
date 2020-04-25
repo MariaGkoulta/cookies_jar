@@ -38,6 +38,7 @@ include '../phpbb/functions.php';
 $nameTools = $langOrganisation;
 $navigation[]= array ("url"=>"../phpbb/index.php", "name"=> $langForums);
 
+$token = $_SESSION['token'];
 $tool_content = $head_content = "";
 $forum_id = intval(@$_REQUEST['forum_id']);
 $cat_id = intval(@$_REQUEST['cat_id']);
@@ -84,7 +85,7 @@ hContent;
 if(isset($forumgo)) {
 	$nameTools = $langAdd;
 	$navigation[]= array ("url"=>"../forum_admin/forum_admin.php", "name"=> $langOrganisation);
-	$result = db_query("SELECT forum_id, forum_name, forum_desc, forum_access, forum_moderator, forum_type 
+	$result = db_query("SELECT forum_id, forum_name, forum_desc, forum_access, forum_moderator, forum_type
 			FROM forums where cat_id='$cat_id'", $currentCourseID);
 	if ($result and mysql_num_rows($result) > 0) {
 		$tool_content .= "<form action=\"$_SERVER[PHP_SELF]?forumgoadd=yes&ctg=$ctg&cat_id=$cat_id\" method=post>
@@ -186,7 +187,7 @@ if(isset($forumgo)) {
 		$result = db_query("select cat_id, cat_title from catagories", $currentCourseID);
 		while(list($cat_id, $cat_title) = mysql_fetch_row($result)) {
 			if ($cat_id == $cat_id_1) {
-					$tool_content .= "<option value='$cat_id' selected>$cat_title</option>"; 
+					$tool_content .= "<option value='$cat_id' selected>$cat_title</option>";
 				} else {
 					$tool_content .= "<option value='$cat_id'>$cat_title</option>";
 				}
@@ -245,7 +246,7 @@ if(isset($forumgo)) {
 	}
 
 	// forum add category
-	elseif(isset($forumcatadd)) {
+	elseif(isset($forumcatadd) && ($token==$_POST['token'])) {
 		db_query("INSERT INTO catagories VALUES (NULL, '$catagories', NULL)", $currentCourseID);
 		$tool_content .= "\n<p class='success_small'>$langCatAdded<br />
 		<a href='$_SERVER[PHP_SELF]?forumadmin=yes'>$langBack</a></p>";
@@ -265,11 +266,11 @@ if(isset($forumgo)) {
 			$forid=$my_forum_id[0];
 		}
 		// --------------------------------
-		// notify users 
+		// notify users
 		// --------------------------------
 		$subject_notify = "$logo - $langCatNotify";
-		$sql = db_query("SELECT DISTINCT user_id FROM forum_notify 
-				WHERE (cat_id = $cat_id) 
+		$sql = db_query("SELECT DISTINCT user_id FROM forum_notify
+				WHERE (cat_id = $cat_id)
 				AND notify_sent = 1 AND course_id = $cours_id", $mysqlMainDb);
 		$body_topic_notify = "$langBodyCatNotify $langInCat '$ctg' \n\n$gunet";
 		while ($r = mysql_fetch_array($sql)) {
@@ -277,7 +278,7 @@ if(isset($forumgo)) {
 			send_mail('', '', '', $emailaddr, $subject_notify, $body_topic_notify, $charset);
 		}
 		// end of notification
-		
+
 		$tool_content .= "\n<p class='success_small'>$langForumCategoryAdded<br />
 		<a href='$_SERVER[PHP_SELF]?forumgo=yes&cat_id=$cat_id&ctg=$ctg'>$langBack</a></p>";
 	}
@@ -305,10 +306,10 @@ if(isset($forumgo)) {
 			<a href=\"$_SERVER[PHP_SELF]?forumgo=yes&ctg=$ctg&cat_id=$cat_id\">$langBack</a></p>";
 	} else {
 		if(isset($forumcatnotify)) { // modify forum category notification
-			$rows = mysql_num_rows(db_query("SELECT * FROM forum_notify 
+			$rows = mysql_num_rows(db_query("SELECT * FROM forum_notify
 				WHERE user_id = $uid AND cat_id = $cat_id AND course_id = $cours_id"));
 			if ($rows > 0) {
-				db_query("UPDATE forum_notify SET notify_sent = '$forumcatnotify' 
+				db_query("UPDATE forum_notify SET notify_sent = '$forumcatnotify'
 					WHERE user_id = $uid AND cat_id = $cat_id AND course_id = $cours_id");
 			} else {
 				db_query("INSERT INTO forum_notify SET user_id = $uid,
@@ -328,7 +329,7 @@ if(isset($forumgo)) {
 		while(list($cat_id, $cat_title) = mysql_fetch_row($result)) {
 			$gets = db_query("SELECT COUNT(*) AS total FROM forums WHERE cat_id=$cat_id", $currentCourseID);
 			$numbers = mysql_fetch_array($gets);
-			list($forum_cat_action_notify) = mysql_fetch_row(db_query("SELECT notify_sent FROM forum_notify 
+			list($forum_cat_action_notify) = mysql_fetch_row(db_query("SELECT notify_sent FROM forum_notify
 				WHERE user_id = $uid AND cat_id = $cat_id AND course_id = $cours_id", $mysqlMainDb));
 			if (!isset($forum_cat_action_notify)) {
 				$link_notify = FALSE;
@@ -346,7 +347,7 @@ if(isset($forumgo)) {
 			<img src='../../template/classic/img/edit.gif' border='0' title='$langModify'></img></a>&nbsp;
 			<a href='$_SERVER[PHP_SELF]?forumcatdel=yes&cat_id=$cat_id&ok=0' onClick='return confirmation();'>
 			<img src='../../template/classic/img/delete.gif' border='0' title='$langDelete'></img></a>
-			<a href='$_SERVER[PHP_SELF]?forumcatnotify=$link_notify&cat_id=$cat_id'>	
+			<a href='$_SERVER[PHP_SELF]?forumcatnotify=$link_notify&cat_id=$cat_id'>
 			<img src='../../template/classic/img/announcements$icon.gif' border='0' title='$langNotify'></img></a>
 			</td></tr>";
 			$i++;
@@ -364,6 +365,7 @@ if(isset($forumgo)) {
 		</tr>
 		<tr><th>&nbsp;</th>
 		<td><input type=hidden name=forumcatadd value=yes><input type=submit value='$langAdd'></td>
+    <input type=hidden name=token value=$token>
 		</tr>
 		</thead>
 		</table></form>
