@@ -60,6 +60,8 @@ $require_login = TRUE;
 $require_help = FALSE;
 include '../../include/baseTheme.php';
 include '../../include/sendMail.inc.php';
+
+$token = $_SESSION['token'];
 $tool_content = "";
 $lang_editor = langname_to_code($language);
 $head_content = <<<hContent
@@ -101,7 +103,7 @@ if (!does_exists($forum, $currentCourseID, "forum")) {
 	$tool_content .= $langErrorPost;
 }
 
-if (isset($submit) && $submit) {
+if (isset($submit) && $submit && ($token==$_POST['token'])) {
 	$subject = strip_tags($subject);
 	if (trim($message) == '' || trim($subject) == '') {
 		$tool_content .= $langEmptyMsg;
@@ -111,7 +113,7 @@ if (isset($submit) && $submit) {
 	if (!isset($username)) {
 		$username = $langAnonymous;
 	}
-	
+
 	if($forum_access == 3 && $user_level < 2) {
 		$tool_content .= $langNoPost;
 		draw($tool_content, 2, 'phpbb', $head_content);
@@ -171,21 +173,21 @@ if (isset($submit) && $submit) {
 		SET forum_posts = forum_posts+1, forum_topics = forum_topics+1, forum_last_post_id = $post_id
 		WHERE forum_id = '$forum'";
 	$result = db_query($sql, $currentCourseID);
-	
+
 	$topic = $topic_id;
 	$total_forum = get_total_topics($forum, $currentCourseID);
-	$total_topic = get_total_posts($topic, $currentCourseID, "topic")-1;  
+	$total_topic = get_total_posts($topic, $currentCourseID, "topic")-1;
 	// Subtract 1 because we want the nr of replies, not the nr of posts.
 	$forward = 1;
 
 	// --------------------------------
-	// notify users 
+	// notify users
 	// --------------------------------
 	$subject_notify = "$logo - $langNewForumNotify";
 	$category_id = forum_category($forum);
 	$cat_name = category_name($category_id);
-	$sql = db_query("SELECT DISTINCT user_id FROM forum_notify 
-			WHERE (forum_id = $forum OR cat_id = $category_id) 
+	$sql = db_query("SELECT DISTINCT user_id FROM forum_notify
+			WHERE (forum_id = $forum OR cat_id = $category_id)
 			AND notify_sent = 1 AND course_id = $cours_id", $mysqlMainDb);
 	$c = course_code_to_title($currentCourseID);
 	$body_topic_notify = "$langCourse: '$c'\n\n$langBodyForumNotify $langInForums '$forum_name' $langInCat '$cat_name' \n\n$gunet";
@@ -194,7 +196,7 @@ if (isset($submit) && $submit) {
 		send_mail('', '', '', $emailaddr, $subject_notify, $body_topic_notify, $charset);
 	}
 	// end of notification
-	
+
 	$tool_content .= "<table width='99%'><tbody>
 	<tr><td class='success'>
 	<p><b>$langStored</b></p>
@@ -202,7 +204,7 @@ if (isset($submit) && $submit) {
 	<p>$langClick <a href='viewforum.php?forum=$forum_id&amp;total_forum'>$langHere</a> $langReturnTopic</p>
 	</td>
 	</tr>
-	</tbody></table>"; 
+	</tbody></table>";
 } else {
 	if (!$uid AND !$fakeUid) {
 		$tool_content .= "<center><br /><br />
@@ -240,6 +242,7 @@ if (isset($submit) && $submit) {
 	<input type='submit' name='submit' value='$langSubmit' />&nbsp;
 	<input type='submit' name='cancel' value='$langCancelPost' />
 	</td></tr>
+  <td><input type=\"hidden\" name=\"token\" value=\"$token\"/></td>
 	</tbody>
 	</table>
 	<br/>
