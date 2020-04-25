@@ -70,7 +70,7 @@ if (!($uid) or !($_SESSION['uid'])) {
 
 $head_content = '<script type="text/javascript">
 function prepare_message()
-{	
+{
 	document.chatForm.chatLine.value=document.chatForm.msg.value;
 	document.chatForm.msg.value = "";
 	document.chatForm.msg.focus();
@@ -100,7 +100,7 @@ $tool_content .= "
       <input type='text' name='msg' size='80'style='border: 1px solid #CAC3B5; background: #fbfbfb;'>
       <input type='hidden' name='chatLine'>
       <input type='submit' value=' >> '>
-			<input name='token' value='$token' >
+			<input type='hidden' name='token' value='$token' >
 
     </td>
   </tr>
