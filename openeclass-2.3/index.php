@@ -99,7 +99,14 @@ if (isset($_SESSION['shib_uname'])) { // authenticate via shibboleth
 	$is_eclass_unique = is_eclass_unique();
 
 	if(!empty($submit)) {
+
 		unset($uid);
+
+		if (hasSpecialChars($uname)) {
+			header("location:". $_SERVER['PHP_SELF']."");
+			exit();
+		}
+
 		$sqlLogin= "SELECT user_id, nom, username, password, prenom, statut, email, perso, lang
 			FROM user WHERE username='".$uname."'";
 		$result = mysql_query($sqlLogin);
@@ -107,11 +114,11 @@ if (isset($_SESSION['shib_uname'])) { // authenticate via shibboleth
 		$warning = "";
 		$auth_allow = 0;
 		$exists = 0;
-                if (!isset($_COOKIE) or count($_COOKIE) == 0) {
-                        // Disallow login when cookies are disabled
-                        $auth_allow = 5;
-                } elseif (empty($pass)) {
-                        // Disallow login with empty password
+    if (!isset($_COOKIE) or count($_COOKIE) == 0) {
+      // Disallow login when cookies are disabled
+      $auth_allow = 5;
+    } elseif (empty($pass)) {
+      // Disallow login with empty password
 			$auth_allow = 4;
 		} else {
 			while ($myrow = mysql_fetch_array($result)) {

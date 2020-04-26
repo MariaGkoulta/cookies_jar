@@ -52,7 +52,7 @@ if (isset($close_user_registration) and $close_user_registration == TRUE) {
         draw($tool_content,0);
 	exit;
  }
- 
+
 $lang = langname_to_code($language);
 
 // display form
@@ -130,20 +130,29 @@ if (!isset($submit)) {
 
 	// trim white spaces in the end and in the beginning of the word
 	$uname = preg_replace('/\ +/', ' ', trim(isset($_POST['uname'])?$_POST['uname']:''));
+
 	// registration
 	$registration_errors = array();
+
 	// check if there are empty fields
 	if (empty($nom_form) or empty($prenom_form) or empty($password) or empty($uname)) {
 		$registration_errors[] = $langEmptyFields;
 	} else {
 	// check if the username is already in use
-		$q2 = "SELECT username FROM `$mysqlMainDb`.user WHERE username='".escapeSimple($uname)."'";
+		$q2 = "SELECT username FROM `$mysqlMainDb`.user WHERE username='$uname'";
 		$username_check = mysql_query($q2);
 		if ($myusername = mysql_fetch_array($username_check)) {
 			$registration_errors[] = $langUserFree;
 		}
 	}
-	if (!empty($email) and !email_seems_valid($email)) {
+
+	//check whether special sql chars contained in form's inputs
+	if (hasSpecialChars($uname) or hasSpecialChars($password) or hasSpecialChars($nom_form) or hasSpecialChars($prenom_form) or hasSpecialChars($am)
+	    or hasSpecialChars($email) or hasSpecialChars($_POST['password1'])) {
+			$registration_errors[] = 'Κάποια δεδομένα εισόδου περιέχουν μη επιτρεπόμενα σύμβολα όπως ", \', *, # και άλλα';
+	}
+
+	if ((!empty($email) and !email_seems_valid($email))) {
 		$registration_errors[] = $langEmailWrong;
 	}
 	$auth_method_settings = get_auth_settings($auth);
@@ -183,15 +192,16 @@ if (!isset($submit)) {
 				"$langManager $siteName \n$langTel $telephone \n" .
 				"$langEmail: $emailhelpdesk";
 		}
-	
+
 	send_mail('', '', '', $email, $emailsubject, $emailbody, $charset);
 	$registered_at = time();
 	$expires_at = time() + $durationAccount;  //$expires_at = time() + 31536000;
-	
+
 	// manage the store/encrypt process of password into database
 	$authmethods = array("2","3","4","5");
 	$uname = escapeSimple($uname);  // escape the characters: simple and double quote
 	$password = escapeSimpleSelect($password);  // escape the characters: simple and double quote
+	$am = stripSpecialSqlChars($am);
 	if(!in_array($auth,$authmethods)) {
 		$password_encrypted = md5($password);
 	} else {
@@ -216,7 +226,7 @@ if (!isset($submit)) {
 	$_SESSION['prenom'] = $prenom;
 	$_SESSION['nom'] = $nom;
 	$_SESSION['uname'] = $uname;
-	
+
 	// registration form
 	$tool_content .= "<table width='99%'><tbody><tr>" .
 			"<td class='well-done' height='60'>" .

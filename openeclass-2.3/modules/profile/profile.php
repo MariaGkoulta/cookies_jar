@@ -43,7 +43,7 @@ if (isset($submit) && (!isset($ldap_submit)) && !isset($changePass) && ($token==
                 $username_form = $uname;
         }
 	// check if username exists
-	$username_check=mysql_query("SELECT username FROM user WHERE username='".htmlspecialchars($username_form)."'");
+	$username_check=mysql_query("SELECT username FROM user WHERE username='".escapeSimple($username_form)."'");
 	while ($myusername = mysql_fetch_array($username_check))
 	{
 		$user_exist=$myusername[0];
@@ -77,17 +77,17 @@ if (isset($submit) && (!isset($ldap_submit)) && !isset($changePass) && ($token==
 		exit();
 	}
 
+  //check whether special sql chars contained in form's inputs
+  if (hasSpecialChars($username_form) or hasSpecialChars($prenom_form) or hasSpecialChars($nom_form) or hasSpecialChars($am_form) or hasSpecialChars($email_form)) {
+      header("location:". $_SERVER['PHP_SELF']."?msg=11");
+      exit();
+  }
 	// everything is ok
 	else {
 		##[BEGIN personalisation modification]############
 		$_SESSION['langswitch'] = $language = langcode_to_name($_REQUEST['userLanguage']);
 		$langcode = langname_to_code($language);
 
-		$username_form = htmlspecialchars($username_form, ENT_QUOTES | ENT_HTML401);
-    $nom_form = htmlspecialchars($nom_form, ENT_QUOTES | ENT_HTML401);
-    $prenom_form = htmlspecialchars($prenom_form, ENT_QUOTES | ENT_HTML401);
-    $email_form = htmlspecialchars($email_form, ENT_QUOTES | ENT_HTML401);
-    $am_form = htmlspecialchars($am_form, ENT_QUOTES | ENT_HTML401);
 		if(mysql_query("UPDATE user
 	        SET nom='$nom_form', prenom='$prenom_form',
 	        username='$username_form', email='$email_form', am='$am_form',
@@ -98,7 +98,7 @@ if (isset($submit) && (!isset($ldap_submit)) && !isset($changePass) && ($token==
 			}
 			header("location:". $_SERVER['PHP_SELF']."?msg=1");
 			exit();
-	        }
+	     }
 	}
 }	// if submit
 
@@ -159,6 +159,12 @@ if(isset($msg))
       $type = "caution_small";
       break;
 		}
+    case 11: { //special sql characters used
+      $message = "Έχετε χρησιμοποιήσει μη επιτρεπτούς χαρακτήρες σε κάποια δεδομένα εισόδου σας";
+      $urlText = "";
+      $type = "caution_small";
+      break;
+    }
 		default:die("invalid message id");
 	}
 
@@ -230,9 +236,9 @@ if ((!isset($changePass)) || isset($_POST['submit'])) {
 	if (isset($_SESSION['shib_user'])) {
                 $auth_text = "Shibboleth user";
 		$tool_content .= "<td class=\"caution_small\">&nbsp;&nbsp;&nbsp;&nbsp;<b>".$prenom_form."</b> [".$auth_text."]
-	        <input type=\"hidden\" name=\"prenom_form\" value=\"$prenom_form\"></td>";
+	        <input type=\"hidden\" name=\"prenom_form\" value=\"".htmlspecialchars($prenom_form)."\"></td>";
 	} else {
-		$tool_content .= "<td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"prenom_form\" value=\"$prenom_form\"></td>";
+		$tool_content .= "<td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"prenom_form\" value=\"".htmlspecialchars($prenom_form)."\"></td>";
 	}
 
 	$tool_content .= "</tr>
@@ -241,16 +247,16 @@ if ((!isset($changePass)) || isset($_POST['submit'])) {
 	if (isset($_SESSION['shib_user'])) {
                 $auth_text = "Shibboleth user";
 		$tool_content .= "<td class=\"caution_small\">&nbsp;&nbsp;&nbsp;&nbsp;<b>".$nom_form."</b> [".$auth_text."]
-                <input type=\"hidden\" name=\"nom_form\" value=\"$nom_form\"></td>";
+                <input type=\"hidden\" name=\"nom_form\" value=\"".htmlspecialchars($nom_form)."\"></td>";
 	} else {
-       		$tool_content .= "<td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"nom_form\" value=\"$nom_form\"></td>";
+       		$tool_content .= "<td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"nom_form\" value=\"".htmlspecialchars($nom_form)."\"></td>";
 	}
     $tool_content .= "</tr>";
 
 	if(!in_array($password_form,$authmethods) and $allow_username_change) {
 		$tool_content .= "<tr>
        <th class='left'>$langUsername</th>
-       <td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"username_form\" value=\"$username_form\"></td>
+       <td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"username_form\" value=\"".htmlspecialchars($username_form)."\"></td>
     </tr>";
 	}
 	else		// means that it is external auth method, so the user cannot change this password
@@ -272,7 +278,7 @@ if ((!isset($changePass)) || isset($_POST['submit'])) {
     <tr>
       <th class='left'>".$langUsername. "</th>
       <td class=\"caution_small\">&nbsp;&nbsp;&nbsp;&nbsp;<b>".$username_form."</b> [".$auth_text."]
-        <input type=\"hidden\" name=\"username_form\" value=\"$username_form\">
+        <input type=\"hidden\" name=\"username_form\" value=\"".htmlspecialchars($username_form)."\">
       </td>
     </tr>";
 	}
@@ -281,13 +287,13 @@ if ((!isset($changePass)) || isset($_POST['submit'])) {
 
 	if (isset($_SESSION['shib_user'])) {
         	$tool_content .= "<td class=\"caution_small\">&nbsp;&nbsp;&nbsp;&nbsp;<b>".$email_form."</b> [".$auth_text."]
-                <input type=\"hidden\" name=\"email_form\" value=\"$email_form\"></td>";
+                <input type=\"hidden\" name=\"email_form\" value=\"".htmlspecialchars($email_form)."\"></td>";
 	} else {
-		$tool_content .= "<td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"email_form\" value=\"$email_form\"></td>";
+		$tool_content .= "<td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"email_form\" value=\"".htmlspecialchars($email_form)."\"></td>";
 	}
     $tool_content .= "</tr><tr>
         <th class='left'>$langAm</th>
-        <td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"am_form\" value=\"$am_form\"></td>
+        <td><input class='FormData_InputText' type=\"text\" size=\"40\" name=\"am_form\" value=\"".htmlspecialchars($am_form)."\"></td>
     </tr>";
 	##[BEGIN personalisation modification]############
 	if (isset($_SESSION['perso_is_active'])) {
@@ -307,9 +313,9 @@ if ((!isset($changePass)) || isset($_POST['submit'])) {
     </tr>
 	<tr>
       <th>&nbsp;</th>
-      <td><input type=\"Submit\" name=\"submit\" value=\"$langModify\"></td>
+      <td><input type=\"Submit\" name=\"submit\" value=\"".htmlspecialchars($langModify)."\"></td>
     </tr>
-    <td><input type=\"hidden\" name=\"token\" value=\"$token\"/></td>
+    <td><input type=\"hidden\" name=\"token\" value=\"".htmlspecialchars($token)."\"/></td>
     </tbody>
     </table>
 </form>

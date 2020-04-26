@@ -53,11 +53,16 @@ if (isset($submit) && isset($changePass) && ($changePass == "do")) {
 		exit();
 	}
 
+	 //check whether special sql chars contained in form's inputs
+	if (hasSpecialChars($_REQUEST['password_form1']) or hasSpecialChars($_REQUEST['password_form'])) {
+		header("location:". $passurl."?msg=7");
+		exit();
+	}
+
 	if ($_REQUEST['password_form1'] !== $_REQUEST['password_form']) {
 		header("location:". $passurl."?msg=1");
 		exit();
 	}
-
 	// check if passwd is too easy
 	$sql = "SELECT `nom`,`prenom` ,`username`,`email`,`am` FROM `user`WHERE `user_id`=".$_SESSION["uid"]." ";
 	$result = db_query($sql, $mysqlMainDb);
@@ -136,6 +141,12 @@ if(isset($msg)) {
 
 		case 6: {//not acceptable characters in password
 			$message = $langInvalidCharsPass;
+			$urlText = "";
+			$type = "caution_small";
+			break;
+		}
+		case 7: { //special sql characters containted
+			$message = "Έχετε χρησιμοποιήσει μη επιτρεπτούς χαρακτήρες σε κάποια δεδομένα εισόδου σας";
 			$urlText = "";
 			$type = "caution_small";
 			break;

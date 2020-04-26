@@ -65,7 +65,6 @@ function db_query($sql, $db = FALSE) {
 	return $r;
 }
 
-
 // Check if a string looks like a valid email address
 function email_seems_valid($email)
 {
@@ -189,6 +188,20 @@ function escapeSimple($str)
 			return @mysql_escape_string($str);
 		}
 	}
+}
+
+function stripSpecialSqlChars($str) {
+	$patterns = array('/#*/', '/"*/', '/-*/', "/'*/",'/\/*/', '/\**/', '/\\\*/');
+	$replace = array('');
+
+	return preg_replace($patterns, $replace, $str);
+}
+
+function hasSpecialChars($str) {
+	if (stripSpecialSqlChars($str) !== $str) {
+		return true;
+	}
+	return false;
 }
 
 function escapeSimpleSelect($str)
