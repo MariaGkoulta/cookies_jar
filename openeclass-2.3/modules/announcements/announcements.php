@@ -60,6 +60,7 @@ $action->record('MODULE_ID_ANNOUNCE');
 
 $nameTools = $langAnnouncements;
 $tool_content = $head_content = "";
+$token = $_SESSION['token'];
 
 if ($is_adminOfCourse and
     (isset($_GET['addAnnouce']) or isset($_GET['modify']))) {
@@ -204,7 +205,7 @@ hContent;
 	SUBMIT ANNOUNCEMENT COMMAND
 	--------------------------------------*/
 
-    if (isset($_POST['submitAnnouncement'])) {
+    if (isset($_POST['submitAnnouncement']) && ($token==$_POST['token'])) {
         // modify announcement
         $antitle = autoquote($_POST['antitle']);
         $newContent = autoquote($_POST['newContent']);
@@ -247,7 +248,7 @@ hContent;
             $emailBody = html2text($emailContent);
             $general_to = 'Members of course ' . $currentCourseID;
             while ($myrow = mysql_fetch_array($result)) {
-                    $emailTo = $myrow["email"]; 
+                    $emailTo = $myrow["email"];
                     // check email syntax validity
                     if (!email_seems_valid($emailTo)) {
                             $invalid++;
@@ -359,6 +360,7 @@ hContent;
       <tr>
         <th>&nbsp;</th>
         <td><input type='submit' name='submitAnnouncement' value='$langAdd' /></td>
+        <input type='hidden' name='token' value='$token'>
       </tr>
       </tbody>
       </table>
