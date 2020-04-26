@@ -62,12 +62,13 @@ $nameTools = $langEclassConf;
 $navigation[] = array("url" => "index.php", "name" => $langAdmin);
 // Initialise $tool_content
 $tool_content = "";
+$token = $_SESSION['token'];
 
 /*****************************************************************************
 		MAIN BODY
 ******************************************************************************/
 // Save new config.php
-if (isset($submit))  {
+if (isset($submit) && ($token==$_POST['token']))  {
 	// Make config directory writable
 	@chmod( "../../config",777 );
 	@chmod( "../../config", 0777 );
@@ -306,6 +307,7 @@ $tool_content .= "
   <tr>
     <th class=\"left\">&nbsp;</th>
     <td><input type='submit' name='submit' value='$langModify'></td>
+		<input type='hidden' name='token' value='$token'>
   </tr>
   </tbody>
   </table>

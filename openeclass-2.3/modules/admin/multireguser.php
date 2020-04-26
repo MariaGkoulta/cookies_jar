@@ -16,11 +16,12 @@ include '../../include/sendMail.inc.php';
 $nameTools = $langMultiRegUser;
 $navigation[]= array ("url"=>"index.php", "name"=> $langAdmin);
 $tool_content = "";
+$token = $_SESSION['token'];
 
 $error = '';
 $acceptable_fields = array('first', 'last', 'email', 'id', 'phone', 'username');
 
-if (isset($_POST['submit'])) {
+if (isset($_POST['submit']) && ($token==$_POST['token'])) {
         $send_mail = isset($_POST['send_mail']) && $_POST['send_mail'];
         $unparsed_lines = '';
         $new_users_info = array();
@@ -142,6 +143,7 @@ if (isset($_POST['submit'])) {
 </tr>
 <tr><th>&nbsp;</th>
     <td><input type='submit' name='submit' value='$langSubmit' /></td>
+    <input type='hidden' name='token' value='$token'>
 </tr>
 </table>
 </form>";
@@ -246,4 +248,3 @@ function register($uid, $course_code)
         }
         return false;
 }
-
