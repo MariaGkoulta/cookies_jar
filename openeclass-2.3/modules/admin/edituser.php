@@ -45,6 +45,7 @@ include '../../include/baseTheme.php';
 include 'admin.inc.php';
 include '../auth/auth.inc.php';
 include '../../include/jscalendar/calendar.php';
+$token = $_SESSION['token'];
 
 if (isset($_GET['u']) or isset($_POST['u']))
 $_SESSION['u_tmp']=$u;
@@ -206,6 +207,7 @@ $tool_content .= "
       <input type='hidden' name='u_submitted' value='1' />
       <input type='hidden' name='registered_at' value='".$info['registered_at']."' />
       <input type='submit' name='submit_edituser' value='$langModify' />
+			<input type='hidden' name='token' value='$token' />
     </td>
   </tr>
   <tr>
@@ -287,7 +289,7 @@ $tool_content .= "
 			}
 		}
 	}  else { // if the form was submitted then update user
-
+		if ($token==$_POST['token']) {
 		// get the variables from the form and initialize them
 		$fname = isset($_POST['fname'])?$_POST['fname']:'';
 		$lname = isset($_POST['lname'])?$_POST['lname']:'';
@@ -337,7 +339,7 @@ if (mysql_num_rows($username_check) > 1) {
 		} else {
 			if ($u=='1') $department = 'NULL';
 			$sql = "UPDATE user SET nom = ".autoquote($lname).", prenom = ".autoquote($fname).",
-				username = ".autoquote($username).", email = ".autoquote($email).", 
+				username = ".autoquote($username).", email = ".autoquote($email).",
 				statut = ".intval($newstatut).", phone=".autoquote($phone).",
 				department = ".intval($department).", expires_at=".$expires_at.",
                                 am = ".autoquote($am)." WHERE user_id = ".intval($u);
@@ -355,6 +357,7 @@ if (mysql_num_rows($username_check) > 1) {
                         $tool_content .= "<a href='listusers.php'>$langBack</a></center>";
                 }
 	}
+}
 }
 else
 {

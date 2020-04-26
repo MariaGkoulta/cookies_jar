@@ -53,6 +53,7 @@
 // Othewise exit with appropriate message
 $require_admin = TRUE;
 include '../../include/baseTheme.php';
+$token = $_SESSION['token'];
 
 if(!isset($_GET['c'])) { die(); }
 // Define $nameTools
@@ -74,7 +75,7 @@ if (isset($search) && ($search=="yes")) {
 	$searchurl = "&search=yes";
 }
 // Update course status
-if (isset($submit))  {
+if (isset($submit) && ($token==$_POST['token']))  {
   // Update query
 	$sql = mysql_query("UPDATE cours SET visible='$formvisible' WHERE code='".mysql_real_escape_string($_GET['c'])."'");
 	// Some changes occured
@@ -99,7 +100,7 @@ else {
 	<tbody>
 	<tr><th width=\"220\">&nbsp;</th>
 	<td colspan=\"2\"><b>".$langCourseStatusChange."<b></td></tr>";
-	
+
 	$tool_content .= "<tr><th class=\"left\" rowspan=\"3\">$langConfTip</th>
 	<td width=\"1\"><input type=\"radio\" name=\"formvisible\" value=\"2\"".@$visibleChecked[2]."></td>
 	<td>".$langPublic."</td>
@@ -115,6 +116,7 @@ else {
 	<tr>
 	<th>&nbsp;</th>
 	<td colspan=\"2\"><input type='submit' name='submit' value='$langModify'></td>
+	<td><input type=\"hidden\" name=\"token\" value=\"$token\"/></td>
 	</tr>
 	</tbody></table>
 	</form>";

@@ -62,13 +62,14 @@ $nameTools=$sendinfomail;
 $navigation[] = array("url" => "index.php", "name" => $langAdmin);
 // Initialise $tool_content
 $tool_content = "";
+$token = $_SESSION['token'];
 
 /*****************************************************************************
 		MAIN BODY
 ******************************************************************************/
 
 // Send email after form post
-if (isset($_POST['submit']) && ($_POST['body_mail'] != "") && ($_POST['submit'] == $langSend)) {
+if (isset($_POST['submit']) && ($_POST['body_mail'] != "") && ($_POST['submit'] == $langSend) && ($token==$_POST['token'])) {
 	// Where to send the email
 	if ($_POST['sendTo'] == "0") {
 		// All users
@@ -117,6 +118,7 @@ $langEmail : $emailhelpdesk
   <tr>
     <th>&nbsp;</th>
     <td><input type=\"submit\" name=\"submit\" value=\"$langSend\"></input></td>
+		<input type=\"hidden\" name=\"token\" value=\"$token\"/>
   </tr>
   </tbody>
   </table>

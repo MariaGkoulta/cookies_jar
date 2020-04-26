@@ -28,6 +28,7 @@ $require_login = TRUE;
 include '../../include/baseTheme.php';
 $nameTools = $langUnregUser;
 $navigation[]= array ("url"=>"../profile/profile.php", "name"=> $langModifProfile);
+$token = $_SESSION['token'];
 
 $tool_content = "";
 
@@ -48,7 +49,7 @@ if (!isset($doit) or $doit != "yes") {
 			$tool_content .=  "<p><b>$langConfirm</b></p>";
 			$tool_content .=  "<ul class=\"listBullet\">";
 			$tool_content .=  "<li>$langYes: ";
-			$tool_content .=  "<a href='$_SERVER[PHP_SELF]?u=$uid&doit=yes'>$langDelete</a>";
+			$tool_content .=  "<a href='$_SERVER[PHP_SELF]?u=$uid&doit=yes&token=$token'>$langDelete</a>";
 			$tool_content .=  "</li>";
 			$tool_content .=  "<li>$langNo: <a href='../profile/profile.php'>$langBack</a>";
 			$tool_content .=  "</li></ul>";
@@ -61,7 +62,7 @@ if (!isset($doit) or $doit != "yes") {
 		}
 	}  //endif is admin
 } else {
-	if (isset($uid)) {
+	if (isset($uid) && ($token==$_GET['token'])) {
 		$tool_content .=  "<table width=99%><tbody>";
 		$tool_content .=  "<tr>";
 		$tool_content .=  "<td class=\"success\">";
@@ -85,4 +86,3 @@ if (isset($_SESSION['uid'])) {
 	draw($tool_content, 0);
 }
 ?>
-

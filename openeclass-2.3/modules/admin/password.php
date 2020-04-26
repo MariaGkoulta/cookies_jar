@@ -43,6 +43,7 @@ include '../../include/baseTheme.php';
 $nameTools = $langChangePass;
 $navigation[] = array("url" => "index.php", "name" => $langAdmin);
 $navigation[]= array ("url"=>"./edituser.php", "name"=> $langEditUser);
+$token = $_SESSION['token'];
 
 check_uid();
 $tool_content = "";
@@ -73,13 +74,14 @@ if (!isset($changePass)) {
   <tr>
     <th class=\"left\">&nbsp;</th>
     <td><input type=\"submit\" name=\"submit\" value=\"$langModify\"></td>
+		<td><input type=\"hidden\" name=\"token\" value=\"$token\"/></td>
   </tr>
   </tbody>
   </table>
 </form>";
 }
 
-elseif (isset($submit) && isset($changePass) && ($changePass == "do")) {
+elseif (isset($submit) && isset($changePass) && ($changePass == "do") && ($token==$_POST['token'])) {
 	$userid = $_REQUEST['userid'];
 	if (empty($_REQUEST['password_form']) || empty($_REQUEST['password_form1'])) {
 		$tool_content .= mes($langFields, "", 'caution');

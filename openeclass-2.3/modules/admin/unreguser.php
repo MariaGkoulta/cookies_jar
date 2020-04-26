@@ -46,11 +46,12 @@ include '../../include/baseTheme.php';
 $nameTools = $langUnregUser;
 $navigation[]= array ("url"=>"index.php", "name"=> $langAdmin);
 $tool_content = "";
+$token = $_SESSION['token'];
 
 // get the incoming values and initialize them
 $u = isset($_GET['u'])? intval($_GET['u']): false;
 $c = isset($_GET['c'])? intval($_GET['c']): false;
-$doit = isset($_GET['doit']);
+$doit = isset($_GET['doit']) && ($token==$_GET['token']);
 
 $u_account = $u? uid_to_username($u): '';
 $u_realname = $u? uid_to_name($u): '';
@@ -64,7 +65,7 @@ if (!$doit) {
         }
         $tool_content .= ";</p>
                 <ul>
-                <li>$langYes: <a href=\"unreguser.php?u=".htmlspecialchars($u)."&c=".htmlspecialchars($c)."&doit=yes\">$langDelete</a><br>&nbsp;</li>
+                <li>$langYes: <a href=\"unreguser.php?u=".htmlspecialchars($u)."&c=".htmlspecialchars($c)."&token=".htmlspecialchars($token)."&doit=yes\">$langDelete</a><br>&nbsp;</li>
                 <li>$langNo: <a href=\"edituser.php?u=".htmlspecialchars($u)."\">$langBack</a></li>
                 </ul>";
 } else {

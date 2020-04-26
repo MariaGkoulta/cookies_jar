@@ -63,6 +63,8 @@ $nameTools = $langQuota;
 $navigation[] = array("url" => "index.php", "name" => $langAdmin);
 $navigation[] = array("url" => "listcours.php", "name" => $langListCours);
 $navigation[] = array("url" => "editcours.php?c=".htmlspecialchars($_GET['c']), "name" => $langCourseEdit);
+$token = $_SESSION['token'];
+
 // Initialise $tool_content
 $tool_content = "";
 
@@ -78,7 +80,7 @@ if (isset($search) && ($search=="yes")) {
 	$searchurl = "&search=yes";
 }
 // Update course quota
-if (isset($submit))  {
+if (isset($submit) && ($token==$_POST['token']))  {
 	$dq = $dq * 1000000;
         $vq = $vq * 1000000;
         $gq = $gq * 1000000;
@@ -138,6 +140,7 @@ else {
   <tr>
     <th>&nbsp;</th>
     <td><input type='submit' name='submit' value='$langModify'></td>
+		<input type='hidden' name='token' value='$token'>
   </tr>
   </tbody>
   </table>

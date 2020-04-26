@@ -34,6 +34,8 @@ $nameTools = $langAdminUsers;
 $navigation[] = array("url" => "index.php", "name" => $langAdmin);
 $navigation[] = array("url" => "listcours.php", "name" => $langListCours);
 $navigation[] = array("url" => "editcours.php?c=".htmlspecialchars($_GET['c']), "name" => $langCourseEdit);
+$token = $_SESSION['token'];
+
 // Initialise $tool_content
 $tool_content = "";
 
@@ -49,7 +51,7 @@ if (isset($search) && ($search=="yes")) {
 	$searchurl = "&search=yes";
 }
 // Register - Unregister students - professors to course
-if (isset($_POST['submit']))  {
+if (isset($_POST['submit']) && ($token==$_POST['token']))  {
         $regstuds = isset($_POST['regstuds'])? array_map('intval', $_POST['regstuds']): array();
         $regprofs = isset($_POST['regprofs'])? array_map('intval', $_POST['regprofs']): array();
         $reglist = implode(', ', array_merge($regstuds, $regprofs));
@@ -146,7 +148,7 @@ function reverseAll(cbList) {
 
 	// Registered users not registered in the selected course
 	$sqll= "SELECT DISTINCT u.user_id , u.nom, u.prenom FROM user u
-		LEFT JOIN cours_user cu ON u.user_id = cu.user_id 
+		LEFT JOIN cours_user cu ON u.user_id = cu.user_id
                      AND cu.cours_id = $cid
 		WHERE cu.user_id IS NULL ORDER BY nom";
 
@@ -214,6 +216,7 @@ function reverseAll(cbList) {
 		$a++;
 	}
 	$tool_content .= "</select></th></tr><tr><td>&nbsp;</td>
+		<input type=\"hidden\" name=\"token\" value=\"$token\"/>
 		<td><input type=submit value=\"".$langAcceptChanges."\" name=\"submit\" onClick=\"selectAll(this.form.elements[5],this.form.elements[6],true)\"></td>
 		<td>&nbsp;</td>
 		</tr></tbody></table>";

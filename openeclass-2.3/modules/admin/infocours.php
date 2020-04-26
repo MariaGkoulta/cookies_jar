@@ -66,6 +66,7 @@ $navigation[] = array("url" => "listcours.php", "name" => $langListCours);
 $navigation[] = array("url" => "editcours.php?c=".htmlspecialchars($_GET['c']), "name" => $langCourseEdit);
 // Initialise $tool_content
 $tool_content = "";
+$token = $_SESSION['token'];
 
 /*****************************************************************************
 		MAIN BODY
@@ -75,7 +76,7 @@ if (isset($search) && ($search=="yes")) {
 	$searchurl = "&search=yes";
 }
 // Update cours basic information
-if (isset($submit))  {
+if (isset($submit) && ($token==$_POST['token']))  {
   // Get faculte ID and faculte name for $faculte
   // $faculte example: 12--Tmima 1
   list($facid, $facname) = explode("--", $faculte);
@@ -136,6 +137,7 @@ else {
   <tr>
     <th>&nbsp;</th>
     <td><input type='submit' name='submit' value='$langModify'></td>
+		<input type='hidden' name='token' value='$token'>
   </tr>
   </tbody>
   </table>
