@@ -32,6 +32,7 @@ $nameTools = $langAdminAn;
 $tool_content = $head_content = "";
 
 $lang_editor = langname_to_code($language);
+$token = $_SESSION['token'];
 
 $head_content .= "
 <script type='text/javascript'>
@@ -92,7 +93,7 @@ if (isset($_GET['delete'])) {
                 $visibleToModify = $myrow['visible'];
                 $displayAnnouncementList = true;
         }
-} elseif (isset($_POST['submitAnnouncement'])) {
+} elseif (isset($_POST['submitAnnouncement']) && ($token==$_POST['token'])) {
 	// submit announcement command
         if (isset($_POST['id'])) {
                 // modify announcement
@@ -170,6 +171,7 @@ if ($displayForm && (@$addAnnouce==1 || isset($modify))) {
                        </td></tr>
               <tr><th class='left'>&nbsp;</th>
                   <td><input type='submit' name='submitAnnouncement' value='$langSubmit' /></td></tr>
+                  <input type='hidden' name='token' value='$token'>
               <tr><td colspan='2'>&nbsp;</td></tr>
           </tbody>
        </table>
